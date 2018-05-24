@@ -1,3 +1,5 @@
+from random import randint
+
 from src.Chromosome import Chromosome
 
 
@@ -13,7 +15,7 @@ class Controller:
         # Read data from file
         with open(self.filename, "r") as file:
             for line in file:
-                data.append(line.strip("\n").split(","))
+                data.append([float(x) for x in line.strip("\n").split(",")])
 
         return data
 
@@ -22,9 +24,11 @@ class Controller:
         # Generate the terminal indexes
         terminals = [i for i in range(1, len(self.data[0]) - 2)]
 
+        sum = 0
+
         # Generate the chromosomes
         for index in range(len(self.chromosomes)):
             self.chromosomes[index] = Chromosome(terminals)
 
         print(self.chromosomes[0])
-        print(self.chromosomes[0].evaluate(self.chromosomes[0].start_node))
+        print(self.chromosomes[0].evaluate(self.chromosomes[0].start_node, self.data[randint(0, len(self.data) - 1)]))

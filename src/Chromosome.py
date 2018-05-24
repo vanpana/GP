@@ -1,18 +1,20 @@
+import copy
 from random import *
 
 from src.Node import Node
 
 
 class Chromosome:
-    MAX_DEPTH = 5
+    MAX_DEPTH = 8
     functions = ['+', '-', '*', '/']
 
     def __init__(self, terminals, d=MAX_DEPTH):
-        self.terminals = terminals
+        self.terminals = copy.deepcopy(terminals)
         self.max_depth = d
         self.fitness = 0
         self.size = 0
-        self.start_node = self.full_expression(0, terminals)
+        self.node_values = []
+        self.start_node = self.full_expression(0, self.terminals)
 
     def full_expression(self, depth, terminals):
         if depth < self.max_depth:
@@ -20,17 +22,19 @@ class Chromosome:
             return Node(self.functions[operator], self.full_expression(depth + 1, terminals),
                         self.full_expression(depth + 1, terminals))
         else:
-            return Node(terminals.pop(randint(0, len(terminals) - 1)))
+            value = terminals.pop(randint(0, len(terminals) - 1))
+            self.node_values.append(value)
+            return Node(value)
 
-    def evaluate(self, root):
+    def evaluate(self, root, values):
         if root is None:
             return 0
 
         if root.left is None and root.right is None:
-            return root.value
+            return values[root.value]
 
-        left_sum = self.evaluate(root.left)
-        right_sum = self.evaluate(root.right)
+        left_sum = self.evaluate(root.left, values)
+        right_sum = self.evaluate(root.right, values)
 
         if root.value == '+':
             return left_sum + right_sum
@@ -42,7 +46,10 @@ class Chromosome:
             return left_sum * right_sum
 
         elif root.value == '/':
-            return left_sum / right_sum
+            if right_sum == 0:
+                return 0
+            else:
+                return left_sum / right_sum
 
     def __str__(self):
         return str(self.start_node)
