@@ -5,7 +5,9 @@ class Node:
         self.right = right
 
     def __str__(self):
-        print("d: {0}, l: {1}, r: {2}".format(self.value, self.left, self.right))
+        if self.left is not None and self.right is not Node:
+            return "(" + str(self.left) + " " + str(self.value) + " " + str(self.right) + ")"
+        return str(self.value)
 
     def __repr__(self):
         return self.__str__()

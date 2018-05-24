@@ -1,8 +1,6 @@
 from src.Controller import Controller
 
 if __name__ == '__main__':
-    print("Hello world")
+    chromosome_number = 10
 
-    ctrl = Controller("../data/data_100.csv")
-
-    ctrl.run()
+    ctrl = Controller(10, "../data/data_100.csv")
