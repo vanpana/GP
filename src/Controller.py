@@ -6,8 +6,9 @@ from src.Chromosome import Chromosome
 
 
 class Controller:
-    def __init__(self, chromosome_number, filename):
+    def __init__(self, chromosome_number, generations, filename):
         self.filename = filename
+        self.generations = generations
         self.data = self.load_data()
         self.chromosomes = [None for _ in range(chromosome_number)]
         self.generate_chromosomes()
@@ -43,3 +44,8 @@ class Controller:
         fitness = [(x * 100) / maxfit for x in fitness]
         print(mean(fitness))
         # print(fit / len(self.chromosomes))
+
+    def run(self):
+        while self.generations:
+
+            self.generations -= 1

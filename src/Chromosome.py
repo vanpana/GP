@@ -52,7 +52,47 @@ class Chromosome:
                 return left_sum / right_sum
 
     def fitness_func(self, values):
-        return values[-1] - self.evaluate(self.start_node, values)
+        self.fitness = abs(values[-1] - self.evaluate(self.start_node, values))
+        return self.fitness
+
+    def crossover(self, new_node, depth, p=0.1):
+        if random() < p:
+            this_level = [self.start_node]
+            current_depth = 0
+            while this_level:
+                next_level = []
+
+                if current_depth == depth:
+                    node = next_level[randint(0, len(next_level) - 1)]
+
+                    if random() < 0.5:
+                        node.left = new_node
+                    else:
+                        node.right = new_node
+
+                    break
+                for n in this_level:
+                    if n.left:
+                        next_level.append(n.left)
+                    if n.right:
+                        next_level.append(n.right)
+                this_level = next_level
+                current_depth += 1
+
+    def traverse(self, root):
+        this_level = [root]
+        levels = []
+        while this_level:
+            nextlevel = list()
+            levels.append(this_level)
+            for n in this_level:
+                if n.left:
+                    nextlevel.append(n.left)
+                if n.right:
+                    nextlevel.append(n.right)
+            this_level = nextlevel
+
+        return levels
 
     def __str__(self):
         return str(self.start_node)
