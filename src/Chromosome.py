@@ -5,7 +5,7 @@ from src.Node import Node
 
 
 class Chromosome:
-    MAX_DEPTH = 8
+    MAX_DEPTH = 5
     functions = ['+', '-', '*', '/']
 
     def __init__(self, terminals, d=MAX_DEPTH):
@@ -36,6 +36,12 @@ class Chromosome:
         left_sum = self.evaluate(root.left, values)
         right_sum = self.evaluate(root.right, values)
 
+        if left_sum is None:
+            left_sum = 0
+
+        if right_sum is None:
+            right_sum = 0
+
         if root.value == '+':
             return left_sum + right_sum
 
@@ -55,44 +61,58 @@ class Chromosome:
         self.fitness = abs(values[-1] - self.evaluate(self.start_node, values))
         return self.fitness
 
-    def crossover(self, new_node, depth, p=0.1):
-        if random() < p:
-            this_level = [self.start_node]
-            current_depth = 0
-            while this_level:
-                next_level = []
-
-                if current_depth == depth:
-                    node = next_level[randint(0, len(next_level) - 1)]
-
-                    if random() < 0.5:
-                        node.left = new_node
-                    else:
-                        node.right = new_node
-
-                    break
-                for n in this_level:
-                    if n.left:
-                        next_level.append(n.left)
-                    if n.right:
-                        next_level.append(n.right)
-                this_level = next_level
-                current_depth += 1
-
-    def traverse(self, root):
-        this_level = [root]
-        levels = []
+    @staticmethod
+    def get_random_from_depth(chromosome, depth):
+        this_level = [chromosome.start_node]
+        current_depth = 0
         while this_level:
-            nextlevel = list()
-            levels.append(this_level)
+            next_level = []
+
+            # If the current depth has been reached, replace the node
+            if current_depth == depth:
+                return this_level[randint(0, len(this_level) - 1)]
+
+            # Build the next levels
             for n in this_level:
                 if n.left:
-                    nextlevel.append(n.left)
+                    next_level.append(n.left)
                 if n.right:
-                    nextlevel.append(n.right)
-            this_level = nextlevel
+                    next_level.append(n.right)
+            this_level = next_level
+            current_depth += 1
 
-        return levels
+    @staticmethod
+    def crossover(p1, p2):
+        parent1 = copy.deepcopy(p1)
+        parent2 = copy.deepcopy(p2)
+
+        # Get the depth to replace
+        depth = randint(0, parent1.max_depth)
+
+        # Get node to be replaced in first parent
+        old_node = Chromosome.get_random_from_depth(parent1, depth)
+
+        # Get a random node to replace from second parent
+        new_node = Chromosome.get_random_from_depth(parent2, depth)
+
+        # Replace left or right
+        if random() < 0.5:
+            old_node.left = new_node
+        else:
+            old_node.right = new_node
+
+        return parent1
+
+    def mutate(self, p=0.1):
+        if random() < p:
+            depth = randint(0, self.max_depth)
+            node = self.get_random_from_depth(self, depth)
+
+            if depth == self.max_depth:
+                node.value = self.terminals[randint(0, len(self.terminals) - 2)]
+            else:
+                node.value = self.functions[randint(0, len(self.functions) - 1)]
+        return self
 
     def __str__(self):
         return str(self.start_node)
