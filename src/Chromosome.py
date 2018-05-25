@@ -51,5 +51,8 @@ class Chromosome:
             else:
                 return left_sum / right_sum
 
+    def fitness_func(self, values):
+        return values[-1] - self.evaluate(self.start_node, values)
+
     def __str__(self):
         return str(self.start_node)
